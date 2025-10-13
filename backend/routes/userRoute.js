@@ -60,7 +60,7 @@ userRouter.post("/signup", async function(req,res){
 })
 
 
-userRouter.post("/login", async function(req, res){
+userRouter.post("/signin", async function(req, res){
     const validedData = z.object({
          email: z.string().min(4).max(40).email(),
         password: z.string().min(6).regex(/[A-Z]/)

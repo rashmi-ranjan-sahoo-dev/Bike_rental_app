@@ -37,7 +37,7 @@ adminRouter.post("/signup",async function (req,res) {
 
         const response = await adminModel.create({
             email: email,
-            password: password,
+            password: hashedpassword,
             name:name
         })
 
@@ -185,17 +185,6 @@ adminRouter.get("/bike",adminMiddleWare, async function(req,res){
     }
 })
 
-adminRouter.get("/bookings", adminMiddleWare, async (req, res) => {
-  try {
-    const bookings = await bookingModel.find()
-      .populate("user", "name email")
-      .populate("bike", "model type pricePerDay")
-      .populate("helmet", "model");
-    res.json({ bookings });
-  } catch (error) {
-    res.status(500).json({ msg: "Failed to fetch bookings", error: error.message });
-  }
-});
 
 adminRouter.post("/helmet",adminMiddleWare, async function (req, res) {
     
@@ -259,6 +248,18 @@ adminRouter.get("/helmets", adminMiddleWare, async (req, res) => {
     res.json({ helmets });
   } catch (err) {
     res.status(500).json({ msg: "Failed to fetch helmets", error: err.message });
+  }
+});
+
+adminRouter.get("/bookings", adminMiddleWare, async (req, res) => {
+  try {
+    const bookings = await bookingModel.find()
+      .populate("user", "name email")
+      .populate("bike", "model type pricePerDay")
+      .populate("helmet", "model");
+    res.json({ bookings });
+  } catch (error) {
+    res.status(500).json({ msg: "Failed to fetch bookings", error: error.message });
   }
 });
 
