@@ -1,7 +1,7 @@
 import express, { Router } from "express";
 import { bookingModel, bikeModel, helmetModel
 } from "../models/db.js"
-import { userMiddlware } from "../middlewares/userMid.js"
+import  userMiddlware  from "../middlewares/userMid.js"
 
 
 const bookingRouter = Router();
@@ -22,3 +22,5 @@ bookingRouter.post("/",userMiddlware, async function(req,res){
         res.status(500).json({message: "Error creating booking", error})
     }
 })
+
+export default bookingRouter;

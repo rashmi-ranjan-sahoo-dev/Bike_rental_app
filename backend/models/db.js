@@ -68,10 +68,4 @@ const bikeModel = mongoose.model("bike",bikeSchema);
 const helmetModel = mongoose.model("helmet", helmetSchema);
 const bookingModel = mongoose.model("booking",bookingSchema);
 
-module.exports = {
-    userModel,
-    adminModel,
-    bikeModel,
-    helmetModel,
-    bookingModel
-}
+export { userModel, adminModel, bikeModel, helmetModel, bookingModel };

@@ -1,11 +1,15 @@
-import { Router } from "express";
-const userRouter = Router();
-import { userModel,bookingModel } from "../models/db.js"
-import { email, z } from "zod";
-const bcrypt = require("bcrypt");
-import JWT_USER from process.env.JWT_USER_SECRET;
+import { userModel, bookingModel } from "../models/db.js";
+import { z } from "zod";
+import bcrypt from "bcrypt"
 import userMiddleWare from "../middlewares/userMid.js"
+import { Router } from "express";
+import dotenv from "dotenv";
+dotenv.config(); // Loads .env file
 
+
+const JWT_USER = process.env.JWT_USER_SECRET;
+
+const userRouter = Router();
 
 userRouter.post("/signup", async function(req,res){
 
@@ -89,7 +93,7 @@ userRouter.post("/signin", async function(req, res){
         
         if(!passwordMatch) return res.status(400).json({ message: "Invalid credentials"});
 
-        const token = jwt.sign({ userId: user._id }, process.env.JWT_USER)
+        const token = jwt.sign({ userId: user._id }, JWT_USER)
 
         return res.status(200).json({
             message: "Login successful",
@@ -100,15 +104,13 @@ userRouter.post("/signin", async function(req, res){
     }
 })
 
-userRouter.get("/bookeings",userMiddleWare, async function () {
-        try{
-            const bookeings = await bookingModel.find( {user: req.userId})
-            return res.status(200).json(bookeings);
-        }catch(error){
-            return res.status(500).json({ message: "Server error", error });
-        }
-})
+userRouter.get("/bookings", userMiddleWare, async function (req, res) {
+   try {
+    const bookings = await bookingModel.find({ user: req.userId });
+    return res.status(200).json(bookings);
+  } catch (error) {
+    return res.status(500).json({ message: "Server error", error });
+  }
+});
 
-module.exports = {
-    userRouter
-}
+export default userRouter;

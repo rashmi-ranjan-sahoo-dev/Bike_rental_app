@@ -1,13 +1,15 @@
-const express = require("express");
+import express from "express";
+import mongoose from "mongoose";
+import cors from "cors";
+import dotenv from "dotenv";
+
+import userRouter from "./routes/userRoute.js";
+import adminRouter from "./routes/adminRoute.js";
+import bookingRouter from "./routes/bookingRoute.js";
+
+dotenv.config();
+
 const app = express();
-const mongoose = require("mongoose");
-const cors = require("cors");
-require('dotenv').config();
-
-const { userRouter } = require("./routes/userRoute");
-const { adminRouter } = require("./routes/adminRoute");
-const { bookingRouter } = require("./routes/bookingRoute");
-
 
 app.use(express.json());
 app.use(cors());
@@ -24,4 +26,4 @@ async function main() {
     app.listen(port, () => console.log('Listeing on port 3000'))
 }
 
-main();
+main(); 

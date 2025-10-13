@@ -4,7 +4,9 @@ import { adminModel, bikeModel, helmetModel} from "../models/db.js"
 import { z } from "zod";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import JWT_ADMIN  from process.env.JWT_ADMIN_SECRET;
+import dotenv from "dotenv";
+dotenv.config();
+const JWT_ADMIN  = process.env.JWT_ADMIN_SECRET;
 import adminMiddleWare from "../middlewares/adminMid.js"
 
 
@@ -136,6 +138,7 @@ adminRouter.post("/bike",adminMiddleWare, async function(req,res){
 
         res.json({ message: "bike added", bike: newBike});
     } catch(error){
+        console.log("Error in bike post Route");
         res.status(500).json({message: "Failed to add bike", error: error.message})
     }
 });
@@ -264,7 +267,4 @@ adminRouter.get("/bookings", adminMiddleWare, async (req, res) => {
 });
 
 
-module.exports = {
-    adminRouter: adminRouter
-}
-
+export default adminRouter
