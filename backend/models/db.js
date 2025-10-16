@@ -7,7 +7,6 @@ const userSchema = new Schema({
     email: {type: String, require: true, unique: true},
     password: {type: String, require: true},
     phone: {type: String},
-    booking: [{type: mongoose.Schema.Types.ObjectId, ref: "booking"}] 
 }, {timestamps: true});
 
 const adminSchema = new Schema({

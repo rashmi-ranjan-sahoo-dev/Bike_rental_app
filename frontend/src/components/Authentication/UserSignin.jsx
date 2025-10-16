@@ -1,12 +1,12 @@
-
+import React from 'react'
 import app_logo from "../../assets/motorbike.png";
 import axios from 'axios';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { API } from '../../api/api';
 
-const AdminSignin = () => {
-     const [formData, setFormData] = useState({
+const UserSignin = () => {
+    const [formData, setFormData] = useState({
             name: "",
             email: "",
         })
@@ -24,9 +24,9 @@ const AdminSignin = () => {
     
             try{
     
-                const res = await axios.post(`${API}/admin/signin`,formData);
+                const res = await axios.post(`${API}/user/signin`,formData);
 
-                localStorage.setItem("admin",res.data.token);
+                localStorage.setItem("user",res.data.token);
     
                 setMessage(res.data.message || "Signin Successful!💐..")
     
@@ -61,4 +61,4 @@ const AdminSignin = () => {
   )
 }
 
-export default AdminSignin
+export default UserSignin
