@@ -26,7 +26,7 @@ const AdminSignin = () => {
     
                 const res = await axios.post(`${API}/admin/signin`,formData);
 
-                localStorage.setItem("admin",res.data.token);
+                localStorage.setItem("adminToken",res.data.token);
     
                 setMessage(res.data.message || "Signin Successful!💐..")
     
