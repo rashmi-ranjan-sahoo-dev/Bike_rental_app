@@ -32,6 +32,8 @@ adminRouter.post("/signup",async function (req,res) {
         return;
     }
 
+    console.log(req.body);
+
     const { email, password, name} = req.body;
 
     try{
@@ -177,7 +179,7 @@ adminRouter.delete("/bike", adminMiddleWare, async (req, res) =>{
 });
 
 
-adminRouter.get("/bike",adminMiddleWare, async function(req,res){
+adminRouter.get("/bikes",adminMiddleWare, async function(req,res){
 
     try{
         const bikes = await bikeModel.find();

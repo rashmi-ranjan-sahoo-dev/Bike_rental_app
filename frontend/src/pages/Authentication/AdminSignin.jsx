@@ -30,7 +30,7 @@ const AdminSignin = () => {
     
                 setMessage(res.data.message || "Signin Successful!💐..")
     
-                navigate(`/`);
+                navigate(`/admin/dashboard`);
             } catch (error) {
           setMessage(error.response?.data?.message || "Signin Failed");
         }
