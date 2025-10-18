@@ -15,9 +15,15 @@ export default function Helmets() {
   });
   const [editId, setEditId] = useState(null);
 
+  const token = localStorage.getItem("adminToken");
+
   const fetchHelmets = async () => {
     try {
-      const res = await axios.get(`${API}/admin/helmets`);
+      const res = await axios.get(`${API}/admin/helmets`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
       setHelmets(res.data.helmets || []);
     } catch (err) {
       console.error("Failed to fetch helmets", err);
@@ -43,9 +49,17 @@ export default function Helmets() {
       };
 
       if (editId) {
-        await axios.put(`${API}/admin/helmet`, { helemtId: editId, ...payload });
+        await axios.put(`${API}/admin/helmet`, { helmetId: editId, ...payload }, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
       } else {
-        await axios.post(`${API}/admin/helmet`, payload);
+        await axios.post(`${API}/admin/helmet`, payload, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
       }
 
       setFormData({
@@ -67,7 +81,12 @@ export default function Helmets() {
   const handleDelete = async (id) => {
     if (!confirm("Delete this helmet?")) return;
     try {
-      await axios.delete(`${API}/admin/helmet`, { data: { helmetId: id } });
+      await axios.delete(`${API}/admin/helmet`, { 
+        data: { helmetId: id },
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
       fetchHelmets();
     } catch (err) {
       console.error("Delete failed", err);
@@ -192,6 +211,8 @@ export default function Helmets() {
               <th className="p-2 text-left">Model</th>
               <th className="p-2 text-left">Status</th>
               <th className="p-2 text-left">Price/Day</th>
+              <th className="p-2 text-left">Price/Hour</th>
+              <th className="p-2 text-left">Price/Week</th>
               <th className="p-2 text-left">Actions</th>
             </tr>
           </thead>
@@ -210,6 +231,8 @@ export default function Helmets() {
                 <td className="p-2">{helmet.model}</td>
                 <td className="p-2 capitalize">{helmet.status}</td>
                 <td className="p-2">₹{helmet.pricePerDay}</td>
+                <td className="p-2">₹{helmet.pricePerHour}</td>
+                <td className="p-2">₹{helmet.pricePerWeek}</td>
                 <td className="p-2 space-x-2">
                   <button onClick={() => handleEdit(helmet)} className="text-blue-600">Edit</button>
                   <button onClick={() => handleDelete(helmet._id)} className="text-red-600">Delete</button>
@@ -218,7 +241,7 @@ export default function Helmets() {
             ))}
             {helmets.length === 0 && (
               <tr>
-                <td colSpan="5" className="p-4 text-center text-gray-500">No helmets found</td>
+                <td colSpan="7" className="p-4 text-center text-gray-500">No helmets found</td>
               </tr>
             )}
           </tbody>

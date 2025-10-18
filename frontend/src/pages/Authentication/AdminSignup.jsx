@@ -17,12 +17,15 @@ const AdminSignup = () => {
 
     const navigate = useNavigate();
 
+    
+    console.log(`${API}/admin/signup`);
+
     const handelChange = (e) =>{
       setFormData({...formData ,[e.target.name] : e.target.value});
       }
 
       const handleSubmit = async (e) =>{
-        e.preventDefualt();
+        e.preventDefault();
 
         try{
 
@@ -30,7 +33,7 @@ const AdminSignup = () => {
 
             setMessage(res.data.message || "Signup Successful!💐..")
 
-            navigate(`/admin}/signin`);
+            navigate("/admin/signin");
         } catch (error) {
       setMessage(error.response?.data?.message || "Signup Failed");
     }
@@ -47,7 +50,7 @@ const AdminSignup = () => {
             <p className='font-semibold text-xl'>Create an account!</p>
         </div>
         <div>
-            <form action="" onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit}>
                 <p>Name</p>
                 <input className='w-80 border rounded text-center' type="text" name='name' placeholder='Name' onChange={handelChange} />
                 <p>Email</p>

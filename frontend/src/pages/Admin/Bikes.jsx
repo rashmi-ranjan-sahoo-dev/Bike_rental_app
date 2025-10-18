@@ -6,8 +6,8 @@ const Bikes = () => {
 
     const [bikes, setBikes] = useState([]);
     const [formData,setFormData] = useState({
-        modle: "",
-        type: "",
+        model: "",
+        type: "motorbike",
         pricePerDay: "",
         pricePerHour: "",
         pricePerWeek: "",
@@ -17,9 +17,15 @@ const Bikes = () => {
 
     const [editId, setEditId] = useState(null);
 
+    const token = localStorage.getItem("adminToken")
+
     const fetchBikes = async () =>{
         try {
-            const res = await axios.get(`${API}/admin/bikes`);
+            const res = await axios.get(`${API}/admin/bikes`, {
+              headers: {
+                Authorization: `Bearer ${token}`
+              }
+            });
 
             setBikes(res.data.bikes || [])
         }catch(error){
@@ -47,14 +53,22 @@ const Bikes = () => {
             }
 
             if(editId){
-                await axios.put(`${API}/admin/bike`, { bikeId: editId, ...payload})
+                await axios.put(`${API}/admin/bike`, { bikeId: editId, ...payload},{
+              headers: {
+                Authorization: `Bearer ${token}`
+              }
+            })
             }else {
-                await axios.post(`${API}/admin/bike`, payload)
+                await axios.post(`${API}/admin/bike`, payload, {
+              headers: {
+                Authorization: `Bearer ${token}`
+              }
+            })
             }
 
                setFormData({
                      model: "",
-                     type: "",
+                     type: "motorbike",
                      pricePerDay: "",
                      pricePerHour: "",
                      pricePerWeek: "",
@@ -74,7 +88,11 @@ const Bikes = () => {
        const handleDelete = async (id) => {
          if (!confirm("Delete this bike?")) return;
          try {
-           await axios.delete(`${API}/admin/bike`, { data: { bikeId: id } });
+           await axios.delete(`${API}/admin/bike`, { data: { bikeId: id } }, {
+              headers: {
+                Authorization: `Bearer ${token}`
+              }
+            });
            fetchBikes();
          } catch (err) {
            console.error("Delete failed", err);
@@ -107,24 +125,24 @@ const Bikes = () => {
       className='mb-6 grid grid-cols-1 md:grid-cols-3 gap-3 '>
         <input
          type="text"
-         placeholder='Modle'
-         value={formData.modle}
-         onChange={(e) => handleChange("modle", e.target.value)}
+         placeholder='Model'
+         value={formData.model}
+         onChange={(e) => handleChange("model", e.target.value)}
          className='border p-2 rounded'
          />
 
-         <input  
-         type='text'
-         placeholder ="Type"
-         value = {formData.type}
+         <select value = {formData.type}
          onChange= {(e) => handleChange("type",e.target.value)}
-         className= "border p-2 rounded" />
+         className= "border p-2 rounded" > 
+            <option value="motorbike">motorbike</option>
+            <option value="scooter">scooter</option>
+            <option value="electric">electric</option></select>
 
          <select value={formData.status}
          onChange={(e) => handleChange("status",e.target.value)}
          className='border p-2 rounded'
          >
-            <option value="available">Available</option>
+          <option value="available">Available</option>
             <option value="unavailable">Unavailable</option>
             <option value="maintenance">Maintenance</option>
          </select>
@@ -168,7 +186,7 @@ const Bikes = () => {
                 setEditId(null);
                 setFormData({
                   model: "",
-                  type: "",
+                  type: "motorbike",
                   pricePerDay: "",
                   pricePerHour: "",
                   pricePerWeek: "",
@@ -206,6 +224,8 @@ const Bikes = () => {
               <th className="p-2 text-left">Type</th>
               <th className="p-2 text-left">Status</th>
               <th className="p-2 text-left">Price/Day</th>
+              <th className="p-2 text-left">Price/Hour</th>
+              <th className="p-2 text-left">Price/Week</th>
               <th className="p-2 text-left">Actions</th>
             </tr>
           </thead>
@@ -225,6 +245,8 @@ const Bikes = () => {
                 <td className="p-2">{bike.type}</td>
                 <td className="p-2 capitalize">{bike.status}</td>
                 <td className="p-2">₹{bike.pricePerDay}</td>
+                <td className="p-2">₹{bike.pricePerHour}</td>
+                <td className="p-2">₹{bike.pricePerWeek}</td>
                 <td className="p-2 space-x-2">
                   <button onClick={() => handleEdit(bike)} className="text-blue-600">Edit</button>
                   <button onClick={() => handleDelete(bike._id)} className="text-red-600">Delete</button>
@@ -233,7 +255,7 @@ const Bikes = () => {
             ))}
             {bikes.length === 0 && (
               <tr>
-                <td colSpan="6" className="p-4 text-center text-gray-500">No bikes found</td>
+                <td colSpan="8" className="p-4 text-center text-gray-500">No bikes found</td>
               </tr>
             )}
           </tbody>

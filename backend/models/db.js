@@ -19,7 +19,8 @@ const adminSchema = new Schema({
 const bikeSchema = new Schema({
     model: { type: String, required: true},
     type: { type: String, required: true,
-        enum: ["scooter", "motorbike", "electric"]
+        enum: ["scooter", "motorbike", "electric"],
+        default: "motorbike"
     },
     pricePerHour: {type: Number, required: true},
     pricePerDay: {type: Number, required: true},

@@ -1,13 +1,15 @@
 import { Router } from "express";
 const adminRouter = Router();
-import { adminModel, bikeModel, helmetModel} from "../models/db.js"
+import { adminModel, bikeModel, helmetModel, bookingModel} from "../models/db.js"
 import { z } from "zod";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import adminMiddleWare from "../middlewares/adminMid.js"
+
+
 dotenv.config();
 const JWT_ADMIN  = process.env.JWT_ADMIN_SECRET;
-import adminMiddleWare from "../middlewares/adminMid.js"
 
 
 
@@ -26,7 +28,7 @@ adminRouter.post("/signup",async function (req,res) {
 
     if(!parsedDataWithsuccess.success){
         res.json({
-            message: "Incorect format",
+            message: "Incorrect format",
             error: parsedDataWithsuccess.error
         })
         return;
@@ -46,12 +48,12 @@ adminRouter.post("/signup",async function (req,res) {
         })
 
         res.json({
-            message: "You are Singed Up"
+            message: "You are Signed Up"
         })
     }catch(error){
-        console.log("Error occure during admin singup:",error),
+        console.log("Error occurred during admin signup:",error),
         res.status(500).json({
-            message: "An error occurred during singup",
+            message: "An error occurred during signup",
             error: error.message
         })
     }
@@ -71,30 +73,40 @@ adminRouter.post("/signin", async function (req,res) {
 
     if(!parsedDataWithsuccess.success){
         res.json({
-                message:"Incorect format",
-                error: parsedDataWithsuccess.error
-            })
+            message: "Incorrect format",
+            error: parsedDataWithsuccess.error
+        })
             return;
         }
 
         const {email, password} = req.body;
+        // console.log(req.body);
 
         try{
              const response = await adminModel.findOne({
                 email:email
              })
 
+            //  console.log(response);
+
+
              if(!response){
                 res.status(403).json({
                     message:"user not found"
                 })
+                return;
              }
 
-             const passwordMath = bcrypt.compare(password.response.password);
+             const passwordMatch = await bcrypt.compare(password, response.password);
 
-             if(passwordMath){
+            //  console.log(passwordMatch)
 
-                const token = jwt.sign({id: response._id.toString(),JWT_ADMIN})
+            // console.log(response._id.toString());
+            // console.log(JWT_ADMIN);
+
+             if(passwordMatch){
+
+                const token = jwt.sign({id: response._id.toString()},JWT_ADMIN)
 
                 res.json({
                     token: token
@@ -123,22 +135,26 @@ adminRouter.post("/bike",adminMiddleWare, async function(req,res){
 
     const {model, type, status, pricePerHour, pricePerDay, pricePerWeek,imageUrl} = req.body;
 
+     console.log(req.body);
+
     if(!model|| !type|| !status ||!pricePerDay ||!pricePerHour||!pricePerWeek){
         return res.status(403).json({message: "Missing fields"});
     }
 
     try{
         const newBike = await bikeModel.create({
-            model: model,
-            type: type,
+            model,
+            type,
             status: status || "available",
-            pricePerDay: pricePerDay,
-            pricePerHour: pricePerHour,
-            pricePerWeek: pricePerWeek,
-            imageUrl: imageUrl,
+            pricePerDay,
+            pricePerHour,
+            pricePerWeek,
+            imageUrl,
         })
 
-        res.json({ message: "bike added", bike: newBike});
+        console.log(newBike);
+
+       return res.json({ message: "bike added", newBike});
     } catch(error){
         console.log("Error in bike post Route");
         res.status(500).json({message: "Failed to add bike", error: error.message})
@@ -155,7 +171,7 @@ adminRouter.put("/bike",adminMiddleWare,async function(req,res){
 
             res.json({ message: "Bike updated", Bike: updated})
         }catch(error){
-            res.status(500).json({ message: "Faild to update", error: error.message })
+            res.status(500).json({ message: "Failed to update", error: error.message })
         };
 })
 
@@ -163,12 +179,12 @@ adminRouter.put("/bike",adminMiddleWare,async function(req,res){
 adminRouter.delete("/bike", adminMiddleWare, async (req, res) =>{
     const { bikeId } = req.body;
 
-    if(!bikeId) return res.status(403).json({ message: "Bikeid required"});
+    if(!bikeId) return res.status(403).json({ message: "Bike ID required"});
 
     try{
         const deleted = await bikeModel.findByIdAndDelete(bikeId);
 
-        if(!deleted) return res.status(400).json({ message: "bikeId required" });
+        if(!deleted) return res.status(404).json({ message: "Bike not found" });
 
         const bikes = await bikeModel.find();
 
@@ -186,7 +202,7 @@ adminRouter.get("/bikes",adminMiddleWare, async function(req,res){
 
         res.json({message: " All bikes ", bikes: bikes})
     }catch(error){
-        res.status(500).json({ msg: "Failed to accessing bikes", error: err.message });
+        res.status(500).json({ msg: "Failed to accessing bikes", error: error.message });
     }
 })
 
@@ -202,32 +218,33 @@ adminRouter.post("/helmet",adminMiddleWare, async function (req, res) {
   try {
     const newHelmet = await helmetModel.create({
         model: model,
-        status: status || "avialable",
+        status: status || "available",
         pricePerDay: pricePerDay,
-        pricePerHour: pricePerWeek,
+        pricePerHour: pricePerHour,
+        pricePerWeek: pricePerWeek,
         imageUrl: imageUrl
     })
 
-    res.json({ message: " Helmet added", helemt: newHelmet});
+    res.json({ message: " Helmet added", helmet: newHelmet});
   } catch(error){
-    res.status(500).json({ msg: "Faild to add helmet", error:error.message})
+    res.status(500).json({ msg: "Failed to add helmet", error:error.message})
   }
 });
 
 adminRouter.put("/helmet", adminMiddleWare, async function (req, res) {
     
-    const {helemtId, ...updateData} = req.body;
+    const {helmetId, ...updateData} = req.body;
 
-    if(!helemtId) res.status(400).json({ message: "helmetId required"});
+    if(!helmetId) return res.status(400).json({ message: "helmetId required"});
 
     try{
-        const updated = await helmetModel.findByIdAndUpdate(helemtId,updateData);
+        const updated = await helmetModel.findByIdAndUpdate(helmetId,updateData);
 
         if(!updated) return res.status(404).json({ msg: "Helmet not found" });
 
         res.json({ message: "Helmet updated ", helmet: updated});
     } catch(error){
-        res.status(500).json({ message: "Faild to updat helmet", error: error.message});
+        res.status(500).json({ message: "Failed to update helmet", error: error.message});
     }
 })
 
