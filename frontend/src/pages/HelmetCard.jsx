@@ -289,9 +289,18 @@ const BookingModal = ({ helmet, onClose }) => {
 
 const HelmetCard = () => {
 
-  const { bikeOn,setBikeOn} = useContext(ContextApp);
-  setBikeOn(false);
-  console.log(bikeOn);
+ const { bikeOn, setBikeOn } = useContext(ContextApp);
+
+useEffect(() => {
+  setBikeOn(false); // Helmet page active
+  console.log("Helmet page mounted: bikeOn =", false);
+
+  return () => {
+    setBikeOn(true); // When leaving Helmet page
+    console.log("Helmet page unmounted: bikeOn =", true);
+  };
+}, [setBikeOn]);
+
 
   
   const [helmets, setHelmets] = useState([]);
@@ -304,6 +313,7 @@ const HelmetCard = () => {
   }, []);
 
   const fetchHelmets = async () => {
+    console.log(bikeOn);
     try {
       const response = await fetch(`${API}/admin/helmets`);
       const data = await response.json();
