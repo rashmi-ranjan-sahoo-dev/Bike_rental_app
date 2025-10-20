@@ -17,7 +17,7 @@ app.use(cors());
 const port = process.env.PORT;
 const mongo_url = process.env.MONGO_URL;
 
-app.use("api/v1/user",userRouter);
+app.use("/api/v1/user",userRouter);
 app.use("/api/v1/admin",adminRouter);
 app.use("/api/v1/booking",bookingRouter);
 

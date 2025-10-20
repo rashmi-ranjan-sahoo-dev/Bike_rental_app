@@ -1,13 +1,19 @@
 import { Link, useLocation } from "react-router-dom";
 import { Bike, Shield, CalendarCheck, LogIn, LogOut } from "lucide-react";
-
+import logo from "../assets/motorbike.png"
+import { useContext } from "react";
+import { ContextApp } from "../ContextAPI/ContextApp";
 
 
 export default function Sidebar() {
+
+  const { isLoggedIn, setIsLoggedIN } = useContext(ContextApp)
   const location = useLocation();
 
+  console.log(isLoggedIn);
+
   // Optional: authentication state
-  const isLoggedIn = localStorage.getItem("token");
+  // const isLoggedIn = localStorage.getItem("userToken");
 
   const links = [
     { to: "/bikes", label: "Bikes", icon: <Bike size={18} /> },
@@ -20,11 +26,11 @@ export default function Sidebar() {
       {/* Logo & App Name */}
       <div className="flex items-center justify-center h-20 border-b border-gray-700">
         <img
-          src="/logo.png"
+          src={logo}
           alt="App Logo"
-          className="w-10 h-10 mr-2 rounded-full"
+          className="w-15 h-15 mr-2 rounded-full bg-white"
         />
-        <h1 className="text-xl font-bold">Easy Bike</h1>
+        <h1 className="text-xl font-bold text-green-600">Easy Bike</h1>
       </div>
 
       {/* Navigation Links */}
@@ -50,7 +56,8 @@ export default function Sidebar() {
         {isLoggedIn ? (
           <button
             onClick={() => {
-              localStorage.removeItem("token");
+              localStorage.removeItem("userToken");
+              setIsLoggedIn(false)
               window.location.reload();
             }}
             className="flex items-center gap-3 p-3 w-full bg-red-600 hover:bg-red-700 rounded-lg transition"

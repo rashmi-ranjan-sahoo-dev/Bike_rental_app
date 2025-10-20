@@ -1,18 +1,19 @@
-import express, { Router } from "express";
-import { bookingModel, bikeModel, helmetModel
-} from "../models/db.js"
+import express from "express";
+import { bookingModel } from "../models/db.js";
 import  userMiddleware  from "../middlewares/userMid.js"
 
 
 const bookingRouter = express.Router();
 
-bookingRouter.post("/", userMiddleware, async (req, res) => {
+bookingRouter.post("/booking", userMiddleware, async (req, res) => {
   try {
     const { bike, helmet, pickupDate, pickupTime, dropDate, dropTime, totalPrice } = req.body;
 
     if (!pickupDate || !pickupTime || !dropDate || !dropTime || !totalPrice) {
       return res.status(400).json({ message: "All fields are required" });
     }
+
+    console.log(req.body);
 
     const booking = new bookingModel({
       user: req.userId,
