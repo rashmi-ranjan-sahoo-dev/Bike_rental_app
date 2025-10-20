@@ -1,26 +1,35 @@
 import express, { Router } from "express";
 import { bookingModel, bikeModel, helmetModel
 } from "../models/db.js"
-import  userMiddlware  from "../middlewares/userMid.js"
+import  userMiddleware  from "../middlewares/userMid.js"
 
 
-const bookingRouter = Router();
+const bookingRouter = express.Router();
 
-bookingRouter.post("/",userMiddlware, async function(req,res){
-    try{
-        const booking = await bookingModel.create({
-            ...req.body,
-            user: req.userId,
-        })
+bookingRouter.post("/", userMiddleware, async (req, res) => {
+  try {
+    const { bike, helmet, pickupDate, pickupTime, dropDate, dropTime, totalPrice } = req.body;
 
-        await bikeModel.findByIdAndUpdate(req.body.bike, { status: "booked" });
-        if(req.body.helmet) await helmetModel.findByIdAndUpdate(req.body.helmet, { status: "booked"});
-
-        res.status(201).json({ msg: "Booking created", booking });
-    } catch(error){
-        console.error(error);
-        res.status(500).json({message: "Error creating booking", error})
+    if (!pickupDate || !pickupTime || !dropDate || !dropTime || !totalPrice) {
+      return res.status(400).json({ message: "All fields are required" });
     }
-})
 
-export default bookingRouter;
+    const booking = new bookingModel({
+      user: req.userId,
+      bike,
+      helmet,
+      pickupDate,
+      pickupTime,
+      dropDate,
+      dropTime,
+      totalPrice,
+    });
+
+    await booking.save();
+    res.status(201).json({ message: "Booking created successfully", booking });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
+
+export default bookingRouter ;

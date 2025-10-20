@@ -19,11 +19,7 @@ export default function Helmets() {
 
   const fetchHelmets = async () => {
     try {
-      const res = await axios.get(`${API}/admin/helmets`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+      const res = await axios.get(`${API}/admin/helmets`);
       setHelmets(res.data.helmets || []);
     } catch (err) {
       console.error("Failed to fetch helmets", err);

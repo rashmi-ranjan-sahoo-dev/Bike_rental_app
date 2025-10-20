@@ -21,11 +21,7 @@ const Bikes = () => {
 
     const fetchBikes = async () =>{
         try {
-            const res = await axios.get(`${API}/admin/bikes`, {
-              headers: {
-                Authorization: `Bearer ${token}`
-              }
-            });
+            const res = await axios.get(`${API}/admin/bikes`);
 
             setBikes(res.data.bikes || [])
         }catch(error){

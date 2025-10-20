@@ -195,7 +195,7 @@ adminRouter.delete("/bike", adminMiddleWare, async (req, res) =>{
 });
 
 
-adminRouter.get("/bikes",adminMiddleWare, async function(req,res){
+adminRouter.get("/bikes", async function(req,res){
 
     try{
         const bikes = await bikeModel.find();
@@ -264,7 +264,7 @@ adminRouter.delete("/helmet", adminMiddleWare, async (req, res) => {
 });
 
 
-adminRouter.get("/helmets", adminMiddleWare, async (req, res) => {
+adminRouter.get("/helmets", async (req, res) => {
   try {
     const helmets = await helmetModel.find();
     res.json({ helmets });
