@@ -1,1 +1,1 @@
-export const API = "http://localhost:3000/api/v1"
+export const API = "https://bike-rental-app-backend-n3ux.onrender.com"
