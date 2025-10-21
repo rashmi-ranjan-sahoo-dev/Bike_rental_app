@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, CheckCircle, XCircle, Bike, Zap, Wind } from 'lucide-react';
+import axios from 'axios';
 import { API } from '../api/api';
+import { useNavigate } from 'react-router-dom';
 
 const BookingModal = ({ bike, onClose }) => {
+
+  const naviget = useNavigate();
   const [formData, setFormData] = useState({
     pickupDate: '',
     pickupTime: '',
@@ -54,6 +58,26 @@ const BookingModal = ({ bike, onClose }) => {
 
   const handleSubmit = async () => {
     setError('');
+    
+    // Validation
+    if (!formData.pickupDate || !formData.pickupTime || !formData.dropDate || !formData.dropTime) {
+      setError('Please fill in all fields');
+      return;
+    }
+
+    const pickup = new Date(`${formData.pickupDate}T${formData.pickupTime}`);
+    const drop = new Date(`${formData.dropDate}T${formData.dropTime}`);
+    
+    if (drop <= pickup) {
+      setError('Drop date/time must be after pickup date/time');
+      return;
+    }
+
+    if (pickup < new Date()) {
+      setError('Pickup date/time cannot be in the past');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -75,28 +99,34 @@ const BookingModal = ({ bike, onClose }) => {
         totalPrice: totalPrice
       };
 
-      const response = await fetch('/api/v1/booking', {
-        method: 'POST',
+      // console.log('Booking URL:', `${API}/booking`);
+      // console.log('Booking Data:', bookingData);
+      // console.log(token); 
+
+      const response = await axios.post(`${API}/booking`, bookingData, {
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(bookingData)
+        }
       });
 
-      const data = await response.json();
+      console.log('Booking successful:', response.data);
 
-      if (response.ok) {
-        setBookingSuccess(true);
-        setTimeout(() => {
-          onClose();
-        }, 2000);
-      } else {
-        setError(data.message || 'Booking failed');
-      }
+      setBookingSuccess(true);
+      naviget('/orders');
+        onClose();
+        window.location.reload();
+      
+
     } catch (err) {
-      console.log(err)
-      setError('Network error. Please try again.');
+      console.error('Booking error:', err);
+      
+      if (err.code === 'ERR_NETWORK') {
+        setError('Cannot connect to server. Please make sure the backend is running.');
+      } else if (err.response) {
+        setError(err.response.data.message || 'Booking failed');
+      } else {
+        setError(err.message || 'Network error. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -298,9 +328,8 @@ const BikeCard = () => {
 
   const fetchBikes = async () => {
     try {
-      const response = await fetch(`${API}/admin/bikes`);
-      const data = await response.json();
-      setBikes(data.bikes || []);
+      const response = await axios.get(`${API}/admin/bikes`);
+      setBikes(response.data.bikes || []);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching bikes:', error);

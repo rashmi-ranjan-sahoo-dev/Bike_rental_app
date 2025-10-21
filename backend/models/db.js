@@ -48,8 +48,8 @@ const helmetSchema = new Schema({
 
 
 const bookingSchema = new Schema({
-    user: {type: mongoose.Schema.Types.ObjectId, ref: "user", required: true},
-    bike: {type: mongoose.Schema.Types.ObjectId, ref: "bike", required: true},
+    user: {type: mongoose.Schema.Types.ObjectId, ref: "user"},
+    bike: {type: mongoose.Schema.Types.ObjectId, ref: "bike"},
     helmet: {type: mongoose.Schema.Types.ObjectId, ref: "helmet"},
     pickupDate: { type: Date, required: true },  
     pickupTime: { type: String, required: true },

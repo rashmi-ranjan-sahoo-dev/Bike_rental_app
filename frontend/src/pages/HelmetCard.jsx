@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, CheckCircle, XCircle, Shield, Star, Award } from 'lucide-react';
 import { API } from '../api/api';
-import { useContext } from 'react';
-import { ContextApp } from '../ContextAPI/ContextApp';
+import axios from "axios";
+import { useNavigate } from 'react-router-dom';
 
 const BookingModal = ({ helmet, onClose }) => {
+
+    const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     pickupDate: '',
     pickupTime: '',
@@ -77,25 +80,18 @@ const BookingModal = ({ helmet, onClose }) => {
         totalPrice: totalPrice
       };
 
-      const response = await fetch('/api/v1/booking', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(bookingData)
-      });
+      console.log(bookingData);
 
-      const data = await response.json();
-
-      if (response.ok) {
-        setBookingSuccess(true);
-        setTimeout(() => {
-          onClose();
-        }, 2000);
-      } else {
-        setError(data.message || 'Booking failed');
+     const response = await axios.post(`${API}/booking`,bookingData, {
+      headers : {
+        Authorization : `Bearer ${token}`
       }
+     })
+     console.log(response);
+        setBookingSuccess(true);
+        navigate("/orders")
+          onClose();
+       
     } catch (err) {
       console.log(err)
       setError('Network error. Please try again.');
@@ -289,19 +285,6 @@ const BookingModal = ({ helmet, onClose }) => {
 
 const HelmetCard = () => {
 
- const { bikeOn, setBikeOn } = useContext(ContextApp);
-
-useEffect(() => {
-  setBikeOn(false); // Helmet page active
-  console.log("Helmet page mounted: bikeOn =", false);
-
-  return () => {
-    setBikeOn(true); // When leaving Helmet page
-    console.log("Helmet page unmounted: bikeOn =", true);
-  };
-}, [setBikeOn]);
-
-
   
   const [helmets, setHelmets] = useState([]);
   const [selectedHelmet, setSelectedHelmet] = useState(null);
@@ -313,7 +296,6 @@ useEffect(() => {
   }, []);
 
   const fetchHelmets = async () => {
-    console.log(bikeOn);
     try {
       const response = await fetch(`${API}/admin/helmets`);
       const data = await response.json();

@@ -21,7 +21,7 @@ const adminMiddleWare = (req, res, next) => {
     // ✅ Verify token using the same secret
     const decoded = jwt.verify(token, JWT_ADMIN);
 
-    // console.log(decoded.id)
+    console.log(decoded.id)
 
     req.adminId = decoded.id;
     next();
