@@ -1,1 +1,1 @@
-export const API = "https://bike-rental-app-backend-n3ux.onrender.com"
+export const API = "https://bike-rental-app-backend-n3ux.onrender.com/api/v1"
